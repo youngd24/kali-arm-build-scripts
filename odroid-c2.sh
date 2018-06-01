@@ -42,7 +42,7 @@ base="e2fsprogs initramfs-tools kali-defaults kali-menu parted sudo usbutils"
 desktop="fonts-croscore fonts-crosextra-caladea fonts-crosextra-carlito gnome-theme-kali gtk3-engines-xfce kali-desktop-xfce kali-root-login lightdm network-manager network-manager-gnome xfce4 xserver-xorg-video-fbdev"
 tools="aircrack-ng ethtool hydra john libnfc-bin mfoc nmap passing-the-hash sqlmap usbutils winexe wireshark libnss-systemd"
 services="apache2 openssh-server"
-extras="fbset xfce4-terminal xfce4-goodies wpasupplicant"
+extras="fbset xfce4-terminal xfce4-goodies wpasupplicant default-libmysqlclient-dev"
 kali="build-essential debhelper devscripts dput lintian quilt git-buildpackage gitk dh-make sbuild"
 python="python-pip python-virtualenv"
 
@@ -208,25 +208,6 @@ EOF
 echo "** SETTING TIMEZONE INFO **"
 cat << EOF > ${basedir}/root/etc/timezone
 America/Chicago
-EOF
-
-echo "** SETTING MOTD **"
-cat << EOF > ${basedir}/root/etc/motd
-
-██████╗ ██╗██████╗ ███████╗ ██████╗ ███████╗
-██╔══██╗██║██╔══██╗██╔════╝██╔═══██╗██╔════╝
-██████╔╝██║██████╔╝█████╗  ██║   ██║███████╗
-██╔═══╝ ██║██╔═══╝ ██╔══╝  ██║   ██║╚════██║
-██║     ██║██║     ███████╗╚██████╔╝███████║
-╚═╝     ╚═╝╚═╝     ╚══════╝ ╚═════╝ ╚══════╝
-
-██╗   ██╗     ██████╗    ██╗
-██║   ██║    ██╔═████╗  ███║
-██║   ██║    ██║██╔██║  ╚██║
-╚██╗ ██╔╝    ████╔╝██║   ██║
- ╚████╔╝     ╚██████╔╝██╗██║
-  ╚═══╝       ╚═════╝ ╚═╝╚═╝
-
 EOF
 
 # Display is... interesting, thanks Amlogic.
