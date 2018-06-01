@@ -40,7 +40,7 @@ unset CROSS_COMPILE
 arm="abootimg fake-hwclock ntpdate u-boot-tools"
 base="e2fsprogs initramfs-tools kali-defaults kali-menu parted sudo usbutils"
 desktop="fonts-croscore fonts-crosextra-caladea fonts-crosextra-carlito gnome-theme-kali gtk3-engines-xfce kali-desktop-xfce kali-root-login lightdm network-manager network-manager-gnome xfce4 xserver-xorg-video-fbdev"
-tools="aircrack-ng ethtool hydra john libnfc-bin mfoc nmap passing-the-hash sqlmap usbutils winexe wireshark"
+tools="aircrack-ng ethtool hydra john libnfc-bin mfoc nmap passing-the-hash sqlmap usbutils winexe wireshark libnss-systemd"
 services="apache2 openssh-server"
 extras="fbset xfce4-terminal xfce4-goodies wpasupplicant"
 kali="build-essential debhelper devscripts dput lintian quilt git-buildpackage gitk dh-make sbuild"
@@ -58,12 +58,14 @@ mirror=http.kali.org
 mkdir -p ${basedir}
 cd ${basedir}
 
+echo "** RUNNING INITIAL DEBOOTSTRAP **"
 # create the rootfs - not much to modify here, except maybe the hostname.
 debootstrap --foreign --arch $architecture kali-rolling kali-$architecture http://$mirror/kali
 
 cp /usr/bin/qemu-aarch64-static kali-$architecture/usr/bin/
 cp /usr/bin/qemu-arm-static kali-$architecture/usr/bin/
 
+echo "** RUNNING SECOND STAGE DEBOOTSTRAP **"
 LANG=C chroot kali-$architecture /debootstrap/debootstrap --second-stage
 cat << EOF > kali-$architecture/etc/apt/sources.list
 deb http://$mirror/kali kali-rolling main contrib non-free
@@ -105,6 +107,7 @@ console-common console-data/keymap/policy select Select keymap from full list
 console-common console-data/keymap/full select en-latin1-nodeadkeys
 EOF
 
+echo "** CREATING THIRD STAGE SCRIPT **"
 cat << EOF > kali-$architecture/third-stage
 #!/bin/bash
 dpkg-divert --add --local --divert /usr/sbin/invoke-rc.d.chroot --rename /usr/sbin/invoke-rc.d
@@ -143,9 +146,12 @@ dpkg-divert --remove --rename /usr/sbin/invoke-rc.d
 rm -f /third-stage
 EOF
 
+echo "** RUNNING THIRD STAGE SCRIPT **"
 chmod +x kali-$architecture/third-stage
 LANG=C chroot kali-$architecture /third-stage
 
+
+echo "** CREATING AND RUNNING CLEANUP SCRIPT **"
 cat << EOF > kali-$architecture/cleanup
 #!/bin/bash
 rm -rf /root/.bash_history
@@ -160,6 +166,7 @@ EOF
 chmod +x kali-$architecture/cleanup
 LANG=C chroot kali-$architecture /cleanup
 
+echo "** UNMOUNTING TEMP LOCAL FILE SYSTEMS **"
 umount kali-$architecture/proc/sys/fs/binfmt_misc
 umount kali-$architecture/dev/pts
 umount kali-$architecture/dev/
@@ -375,6 +382,7 @@ chmod +x ${basedir}/root/usr/share/initramfs-tools/hooks/fbset
 # Uncomment this if you use apt-cacher-ng otherwise git clones will fail.
 #unset http_proxy
 
+echo "** STARTING ON KERNEL **"
 # Kernel section. If you want to use a custom kernel, or configuration, replace
 # them in this section.
 # For some reason, building the kernel in the image fails claiming it's run out
@@ -601,6 +609,8 @@ mkimage -A arm64 -O linux -T ramdisk -C none -a 0 -e 0 -n "uInitrd" -d /boot/ini
 rm -f /create-initrd
 rm -f /usr/bin/qemu-*
 EOF
+
+echo "** CREATING INITRD **"
 chmod +x ${basedir}/root/create-initrd
 LANG=C chroot ${basedir}/root /create-initrd
 umount ${basedir}/root/boot
@@ -627,6 +637,7 @@ kpartx -dv $loopdevice
 #make CROSS_COMPILE=aarch64-linux-gnu- odroidc2_config
 #make CROSS_COMPILE=aarch64-linux-gnu- -j $(grep -c processor /proc/cpuinfo)
 
+echo "** STARTING UBOOT PROCESS **"
 mkdir -p ${basedir}/u-boot
 cd ${basedir}/u-boot
 git clone https://github.com/mdrjr/c2_uboot_binaries
@@ -640,7 +651,7 @@ losetup -d $loopdevice
 # Comment this out to keep things around if you want to see what may have gone
 # wrong.
 echo "Clean up the build system"
-rm -rf ${basedir}/kernel ${basedir}/bootp ${basedir}/root ${basedir}/kali-$architecture ${basedir}/patches ${basedir}/u-boot
+#rm -rf ${basedir}/kernel ${basedir}/bootp ${basedir}/root ${basedir}/kali-$architecture ${basedir}/patches ${basedir}/u-boot
 
 # If you're building an image for yourself, comment all of this out, as you
 # don't need the sha256sum or to compress the image, since you will be testing it
