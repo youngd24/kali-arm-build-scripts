@@ -205,6 +205,30 @@ deb http://http.kali.org/kali kali-rolling main non-free contrib
 deb-src http://http.kali.org/kali kali-rolling main non-free contrib
 EOF
 
+echo "** SETTING TIMEZONE INFO **"
+cat << EOF > ${basedir}/root/etc/timezone
+America/Chicago
+EOF
+
+echo "** SETTING MOTD **"
+cat << EOF > ${basedir}/root/etc/motd
+
+██████╗ ██╗██████╗ ███████╗ ██████╗ ███████╗
+██╔══██╗██║██╔══██╗██╔════╝██╔═══██╗██╔════╝
+██████╔╝██║██████╔╝█████╗  ██║   ██║███████╗
+██╔═══╝ ██║██╔═══╝ ██╔══╝  ██║   ██║╚════██║
+██║     ██║██║     ███████╗╚██████╔╝███████║
+╚═╝     ╚═╝╚═╝     ╚══════╝ ╚═════╝ ╚══════╝
+
+██╗   ██╗     ██████╗    ██╗
+██║   ██║    ██╔═████╗  ███║
+██║   ██║    ██║██╔██║  ╚██║
+╚██╗ ██╔╝    ████╔╝██║   ██║
+ ╚████╔╝     ╚██████╔╝██╗██║
+  ╚═══╝       ╚═════╝ ╚═╝╚═╝
+
+EOF
+
 # Display is... interesting, thanks Amlogic.
 mkdir -p /usr/share/lightdm/lightdm.conf.d
 cat << EOF > ${basedir}/root/usr/share/lightdm/lightdm.conf.d/10-odroidc2.conf
