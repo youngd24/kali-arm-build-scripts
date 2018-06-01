@@ -44,8 +44,9 @@ tools="aircrack-ng ethtool hydra john libnfc-bin mfoc nmap passing-the-hash sqlm
 services="apache2 openssh-server"
 extras="fbset xfce4-terminal xfce4-goodies wpasupplicant"
 kali="build-essential debhelper devscripts dput lintian quilt git-buildpackage gitk dh-make sbuild"
+python="python-pip python-virtualenv"
 
-packages="${arm} ${base} ${desktop} ${tools} ${services} ${extras} ${kali}"
+packages="${arm} ${base} ${desktop} ${tools} ${services} ${extras} ${kali} ${python}"
 architecture="arm64"
 # If you have your own preferred mirrors, set them here.
 # After generating the rootfs, we set the sources.list to the default settings.
